@@ -1,0 +1,5 @@
+[mysqld]
+datadir 		=	/var/lib/mysql
+port			=	3306
+user			=	mysql
+bind_address	=	*
