@@ -1,8 +1,11 @@
-FROM	debian:bullseye
+FROM	alpine:3.17
 
-RUN		apt update && apt upgrade
-RUN		apt install -y mariadb-server
+RUN		apk update
+RUN		apk upgrade
+RUN		apk add mariadb
+RUN		apk add openrc
+
 COPY	conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
-COPY	tool/create_db.sh /home 
-EXPOSE	3306
-CMD		["bash", "/home/create_db.sh"]		
+COPY	tools/configure.sh /home 
+
+#CMD		["sh", "/home/configure.sh"]		

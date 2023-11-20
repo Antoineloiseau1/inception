@@ -10,6 +10,7 @@ services:
       dockerfile:   Dockerfile
     ports:
      -  "443:443"
+    env_file: .env
     restart: always
   
       #mariadb:
@@ -24,12 +25,12 @@ services:
       #restart: always
 
 volumes:
-  mariadb:
+  database:
     driver: local
     driver_opts:
       type: 'none'
       o: bind
-      device: '/home/${USER}/anloisea/data/mariadb'
+      device: '/home/${USER}/anloisea/data/database'
   wordpress:
     driver: local
     driver_opts:
