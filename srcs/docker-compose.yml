@@ -5,24 +5,30 @@ services:
     container_name: nginx
     volumes:
       - "wordpress:/var/www/html"
-    build:  
-      context:      requirements/nginx
-      dockerfile:   Dockerfile
+    build:
+      context: requirements/nginx
+      dockerfile: Dockerfile
+      args:
+        DOMAIN_NAME: ${DOMAIN_NAME}
+        CERTS_: ${CERTS_}
     ports:
      -  "443:443"
     env_file: .env
     restart: always
   
-      #mariadb:
-      # container_name: mariadb
-      #build: requirements/mariadb/.
-      # volumes:
-      #- "mariadb:/var/lib/mysql"
-      # env_file: 
-      # - .env
-      #networks:
-      #- inception
-      #restart: always
+  mariadb:
+    container_name: mariadb
+    build: 
+      context: requirements/mariadb
+      dockerfile: Dockerfile
+    volumes:
+      - "database:/var/lib/mysql"
+      - "logs:/var/log/mysql"
+      - "logs:/var/log/mariadb"
+    env_file: .env
+    networks:
+      - inception
+    restart: always
 
 volumes:
   database:
@@ -37,6 +43,12 @@ volumes:
       type: none
       o: bind
       device: '/home/${USER}/anloisea/data/wordpress'
+  logs:
+    driver: local
+    driver_opts:
+      type: none
+      o:  bind
+      device: '/home/${USER}/anloisea/data/logs'
 
 networks:
   inception:
