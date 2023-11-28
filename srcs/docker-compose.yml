@@ -23,8 +23,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - "database:/var/lib/mysql"
-      - "logs:/var/log/mysql"
-      - "logs:/var/log/mariadb"
     env_file: .env
     networks:
       - inception
@@ -36,19 +34,13 @@ volumes:
     driver_opts:
       type: 'none'
       o: bind
-      device: '/home/${USER}/anloisea/data/database'
+      device: '/home/anloisea/data/database'
   wordpress:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: '/home/${USER}/anloisea/data/wordpress'
-  logs:
-    driver: local
-    driver_opts:
-      type: none
-      o:  bind
-      device: '/home/${USER}/anloisea/data/logs'
+      device: '/home/anloisea/data/wordpress'
 
 networks:
   inception:
