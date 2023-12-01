@@ -1,24 +1,15 @@
-#! /bin/bash
+#!/bin/bash
 
-if [ ! -d "/var/run/mysqld" ]; then
-	mkdir -p /var/run/mysqld
-fi
+service mysql start 
 
-chown mysql:mysql /var/run/mysqld
-chmod 777 /var/run/mysqld
+echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE ;" > configure.sql
+echo "CREATE USER IF NOT EXISTS '$MYSQL_USR'@'%' IDENTIFIED BY '$MYSQL_PASSWORD' ;" >> configure.sql
+echo "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USR'@'%' ;" >> configure.sql
+echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD' ;" >> configure.sql
+echo "FLUSH PRIVILEGES;" >> configure.sql
 
-service mariadb start
+mysql < configure.sql
 
-mariadb -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
-echo	"database Created"
-mariadb -e "CREATE USER IF NOT EXISTS '${MYSQL_USR}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-echo	"User ${MYSQL_USR} Created"
-mariadb -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO ${MYSQL_USR}@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-mariadb -e "FLUSH PRIVILEGES;"
-echo "all privileges granted"
-mariadb -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';"
-echo "root altered"
+kill $(cat /var/run/mysqld/mysqld.pid)
 
-#mysqladmin -u root -p${MYSQL_ROOT_PASSWORD} shutdown
-
-#exec mysqld_safe
+mysqld

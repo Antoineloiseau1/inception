@@ -1,9 +1,7 @@
 SRCS	=	./srcs/docker-compose.yml
 
 all:
-	# adding login.42.fr to localhost
-	# sudo echo "127.0.0.1 anloisea.42.fr" >> /etc/hosts
-	docker compose -f ${SRCS} up -d --build
+		docker compose -f ${SRCS} up -d --build
 
 down:
 		docker compose -f ${SRCS} down

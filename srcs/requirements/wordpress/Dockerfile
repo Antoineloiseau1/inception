@@ -1,7 +1,10 @@
-FROM	alpine:3.17
+FROM	debian:buster
 
-RUN		apk update
-RUN 	apk update
-RUN		apk add php
-RUN 	apk add php-fpm
+RUN	apt update -y
+RUN apt-get install -y curl
+RUN apt-get install -y php-fpm php-mysql
 
+COPY conf/script.sh /
+COPY conf/wp-config.php /
+
+CMD ["sh", "script.sh"]

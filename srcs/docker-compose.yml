@@ -1,6 +1,32 @@
 version: '3.9'
 
-services:
+services: 
+  mariadb:
+    container_name: mariadb
+    build: 
+      context: requirements/mariadb
+      dockerfile: Dockerfile
+    volumes:
+      - "mariadb:/var/lib/mysql"
+    env_file: .env
+    networks:
+      - inception
+    restart: always
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: requirements/wordpress
+      dockerfile: Dockerfile
+    depends_on:
+      - mariadb
+    volumes:
+      - "wordpress:/var/www/html"
+    env_file: .env
+    networks:
+      - inception
+    restart: always
+
   nginx:
     container_name: nginx
     volumes:
@@ -13,29 +39,23 @@ services:
         CERTS_: ${CERTS_}
     ports:
      -  "443:443"
-    env_file: .env
-    restart: always
-  
-  mariadb:
-    container_name: mariadb
-    build: 
-      context: requirements/mariadb
-      dockerfile: Dockerfile
-    volumes:
-      - "database:/var/lib/mysql"
+    depends_on: 
+      - wordpress
     env_file: .env
     networks:
       - inception
     restart: always
-
+  
 volumes:
-  database:
+  mariadb:
+    name: mariadb
     driver: local
     driver_opts:
       type: 'none'
       o: bind
-      device: '/home/anloisea/data/database'
+      device: '/home/anloisea/data/mariadb'
   wordpress:
+    name: wordpress
     driver: local
     driver_opts:
       type: none

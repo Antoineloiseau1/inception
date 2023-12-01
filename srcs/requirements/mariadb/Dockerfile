@@ -1,26 +1,17 @@
-# MariaDB Dockerfile
-FROM debian:bullseye
+FROM debian:buster
 
 # Install MariaDB
 RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get install mariadb-server mariadb-client -y
+RUN apt-get install mariadb-server -y
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 
-# Copy custom my.cnf
-COPY conf/50-server.cnf /etc/mysql/50-server.cnf
-COPY tools/configure.sh /tmp/configure.sh
-RUN	chmod 644 /tmp/configure.sh
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/
+COPY tools/configure.sh / 
 
-# Expose the default MySQL port
-EXPOSE 3306
+#ENV MYSQL_DATABASE=wordpress
+#ENV	MYSQL_USR=anloisea
+#ENV	MYSQL_PASSWORD=born2code
+#ENV MYSQL_ROOT_PASSWORD=root4life
 
-
-ENV MYSQL_DATABASE=wordpress
-ENV	MYSQL_USR=anloisea
-ENV	MYSQL_PASSWORD=born2code
-ENV MYSQL_ROOT_PASSWORD=root4life
-
-# Start MariaDB
-#CMD ["mysqld", "--user=mysql", "--datadir=/var/lib/mysql", "--socket=/run/mysqld/mysqld.sock", "--port=3306"]
-#CMD ["sh", "/tmp/configure.sh"]
-
+CMD ["sh", "/configure.sh"]
