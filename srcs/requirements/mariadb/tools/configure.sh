@@ -1,5 +1,18 @@
 #!/bin/bash
 
+if [ ! -d "/var/run/mysqld" ]; then
+	mkdir -p /var/run/mysqld
+fi
+
+if [ ! -d "/run/mysqld" ]; then
+	mkdir -d /run/mysqld
+fi
+
+chown -R mysql:mysql /var/run/mysqld
+chmod 777 /var/run/mysqld
+chown -R mysql:mysql /run/mysqld
+chmod 777 /run/mysqld
+
 service mysql start 
 
 echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE ;" > configure.sql

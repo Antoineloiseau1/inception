@@ -4,11 +4,9 @@ all:
 		docker compose -f ${SRCS} up -d --build
 
 down:
-		docker compose -f ${SRCS} down
+		docker compose -f ${SRCS} down -v
 
-clean:
-		docker -f srcs/docker-compose.yml down \
-		docker volume rm $$(docker volume ls -q); \
+clean:	down
 		docker network rm $$(docker network ls -q); \
 
 re:		down all
