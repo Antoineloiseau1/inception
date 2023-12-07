@@ -1,28 +1,36 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ ! -d "/var/run/mysqld" ]; then
-	mkdir -p /var/run/mysqld
-fi
-
+#for socket errors
 if [ ! -d "/run/mysqld" ]; then
-	mkdir -d /run/mysqld
+	mkdir -p /run/mysqld
 fi
 
-chown -R mysql:mysql /var/run/mysqld
-chmod 777 /var/run/mysqld
 chown -R mysql:mysql /run/mysqld
-chmod 777 /run/mysqld
 
-service mysql start 
+#if DATABASE is not created
+if [ ! -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
+	
+	chown -R mysql:mysql /var/lib/mysql
 
-echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE ;" > configure.sql
-echo "CREATE USER IF NOT EXISTS '$MYSQL_USR'@'%' IDENTIFIED BY '$MYSQL_PASSWORD' ;" >> configure.sql
-echo "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USR'@'%' ;" >> configure.sql
-echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD' ;" >> configure.sql
-echo "FLUSH PRIVILEGES;" >> configure.sql
+	mysql_install_db --basedir=/usr --datadir=/var/lib/mysql --user=mysql --rpm > /dev/null
 
-mysql < configure.sql
+	mysqld --user=mysql --bootstrap <<EOF
+USE mysql;
+FLUSH PRIVILEGES;
 
-kill $(cat /var/run/mysqld/mysqld.pid)
+DELETE FROM	mysql.user WHERE User='';
+DROP DATABASE test;
+DELETE FROM mysql.db WHERE Db='test';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 
-mysqld
+ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
+
+CREATE DATABASE $MYSQL_DATABASE;
+CREATE USER '$MYSQL_USR'@'%' IDENTIFIED by '$MYSQL_PASSWORD';
+GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USR'@'%';
+
+FLUSH PRIVILEGES;
+EOF
+fi
+
+exec mysqld --user=$MYSQL_USR --console
