@@ -1,17 +1,8 @@
-FROM debian:buster
+FROM alpine:3.17
 
-# Install MariaDB
-RUN apt-get update -y
-RUN apt-get install mariadb-server -y
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade && apk add --no-cache mariadb mariadb-client
 
-COPY conf/50-server.cnf /etc/mysql/my.cnf
-COPY tools/configure.sh / 
-
-#ENV MYSQL_DATABASE=wordpress
-#ENV	MYSQL_USR=anloisea
-#ENV	MYSQL_PASSWORD=born2code
-#ENV MYSQL_ROOT_PASSWORD=root4life
+COPY conf/my.cnf /etc/mysql/my.cnf
+COPY tools/configure.sh /configure.sh
 
 CMD ["sh", "/configure.sh"]
