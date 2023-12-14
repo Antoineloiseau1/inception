@@ -1,24 +1,14 @@
-FROM	alpine:3.17
+FROM debian:buster
 
-RUN 	apk add --update --no-cache nginx openssl
+RUN apt-get update && apt-get install -y nginx openssl
+				
+RUN mkdir -p /etc/nginx/ssl
 
-ARG		CERTS_
-ARG		DOMAIN_NAME
+RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
+					-out /etc/nginx/ssl/server.crt\
+					-keyout /etc/nginx/ssl/server.key\
+					-subj "/C=FR/ST=PACA/L=Nice/O=42/OU=Student/CN='${DOMAIN_NAME}'/UID=anloisea@student.42nice.fr"
 
-#		create a ssl certificate
-RUN		mkdir -p ${CERTS_}
+COPY ./conf/nginx.conf /etc/nginx/conf.d
 
-RUN		openssl req -x509 -nodes \ 
-			-out ${CERTS_}/server.crt \ 
-			-keyout ${CERTS_}/server.key \
-			-subj "/C=FR/ST=PACA/L=Nice/O=42/OU=Student/CN='${DOMAIN_NAME}'/UID=anloisea@student.42nice.fr"
-#optionnal but sercure ?
-RUN			chmod 400 ${CERTS_}/server.crt
-RUN			chmod 400 ${CERTS_}/server.key
-
-COPY 		conf/nginx.conf /etc/nginx/nginx.conf
-
-RUN			mkdir -p /var/www/html
-RUN 		chmod 755 /var/www/html
-
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]

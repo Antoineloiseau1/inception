@@ -1,71 +1,60 @@
-version: '3.9'
+version: '3'
 
-services: 
+services:
+  nginx:
+    container_name: nginx
+    depends_on:
+      - wordpress
+    build: ./requirements/nginx
+    ports:
+      - 443:443
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: always
+    networks:
+      - inception
+
   mariadb:
     container_name: mariadb
-    build: 
-      context: requirements/mariadb
-      dockerfile: Dockerfile
+    build: ./requirements/mariadb
     volumes:
-      - "mariadb:/var/lib/mysql"
-    env_file: .env
+      - mariadb_data:/var/lib/mysql
     networks:
       - inception
     restart: always
-    ports:
-      - "3306:3306"
+    env_file:
+      - .env
 
   wordpress:
     container_name: wordpress
-    build:
-      context: requirements/wordpress
-      dockerfile: Dockerfile
     depends_on:
       - mariadb
-    volumes:
-      - "wordpress:/var/www/html"
-    env_file: .env
-    networks:
-      - inception
-    restart: always
-    ports:
-      - "9000:9000"
-
-  nginx:
-    container_name: nginx
-    volumes:
-      - "wordpress:/var/www/html"
     build:
-      context: requirements/nginx
+      context: ./requirements/wordpress
       dockerfile: Dockerfile
-      args:
-        DOMAIN_NAME: ${DOMAIN_NAME}
-        CERTS_: ${CERTS_}
-    ports:
-     -  "443:443"
-    depends_on: 
-      - wordpress
-    env_file: .env
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - wordpress_data:/var/www/html
     networks:
       - inception
-    restart: always
-  
+
 volumes:
-  mariadb:
-    name: mariadb
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: bind
-      device: '/home/anloisea/data/mariadb'
-  wordpress:
-    name: wordpress
+  mariadb_data:
     driver: local
     driver_opts:
       type: none
+      device: /home/anloisea/data/mysql
       o: bind
-      device: '/home/anloisea/data/wordpress'
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/anloisea/data/wordpress
+      o: bind
 
 networks:
   inception:
     name: inception
+    driver: bridge
