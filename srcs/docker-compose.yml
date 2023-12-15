@@ -5,20 +5,26 @@ services:
     container_name: nginx
     depends_on:
       - wordpress
-    build: ./requirements/nginx
+    env_file: .env
+    build:
+      context: requirements/nginx
+      dockerfile: Dockerfile
+      args:
+        DOMAIN_NAME: ${DOMAIN_NAME}
+        CERTS_:  ${CERTS_}
     ports:
       - 443:443
     volumes:
-      - wordpress_data:/var/www/html
+      - wordpress:/var/www/html
     restart: always
     networks:
       - inception
 
   mariadb:
     container_name: mariadb
-    build: ./requirements/mariadb
+    build: requirements/mariadb
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     networks:
       - inception
     restart: always
@@ -30,24 +36,24 @@ services:
     depends_on:
       - mariadb
     build:
-      context: ./requirements/wordpress
+      context: requirements/wordpress
       dockerfile: Dockerfile
     restart: always
     env_file:
       - .env
     volumes:
-      - wordpress_data:/var/www/html
+      - wordpress:/var/www/html
     networks:
       - inception
 
 volumes:
-  mariadb_data:
+  mariadb:
     driver: local
     driver_opts:
       type: none
-      device: /home/anloisea/data/mysql
+      device: /home/anloisea/data/mariadb
       o: bind
-  wordpress_data:
+  wordpress:
     driver: local
     driver_opts:
       type: none

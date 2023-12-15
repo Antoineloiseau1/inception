@@ -4,7 +4,7 @@ mysql_install_db
 
 if [-d "/var/lib/mysql/wp-content"]
 then
-	echo "Database already exits"
+	echo "Database already exists"
 else
 
 /etc/init.d/mysql start

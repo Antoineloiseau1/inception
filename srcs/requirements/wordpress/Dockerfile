@@ -6,11 +6,6 @@ RUN apt-get update && apt-get install -y \
 				php-cgi \
 				php-mysql \
 				php-fpm \
-				php-pdo \
-				php-gd php-cli \
-				php-mbstring \
-				redis \
-				php-redis \
 				&& rm -rf /var/lib/apt/lists/*
 				
 COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/
