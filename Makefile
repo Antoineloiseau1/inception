@@ -14,11 +14,9 @@ prune:
 
 fclean: stop down
 	-docker rm -f $$(docker ps -a -q)
+	-docker image rm $$(docker images -aq)
 	-docker volume rm $$(docker volume ls -q)
-	-docker system prune --force --all
-	-docker volume prune --force
-	-docker network prune --force
-	-sudo rm -rf /home/anloisea/data
+	-docker metwork rm $$(docker network ls -q)
 
 stop:
 	-docker stop $$(docker ps -qa)

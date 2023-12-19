@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bullseye
 
 RUN apt-get update && apt-get install -y \
 				curl \
@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 				php-fpm \
 				&& rm -rf /var/lib/apt/lists/*
 				
-COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/
+COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/
 
 RUN mkdir /run/php
 
@@ -22,4 +22,4 @@ ENTRYPOINT ["/usr/local/bin/create_wordpress.sh"]
 
 WORKDIR /var/www/html/
 
-CMD ["/usr/sbin/php-fpm7.3", "-F"]
+CMD ["/usr/sbin/php-fpm7.4", "-F"]

@@ -1,13 +1,13 @@
-FROM debian:buster
+FROM debian:bullseye
 
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y mariadb-server 
-RUN apt-get install -y mariadb-client
+#RUN apt-get install -y mariadb-client
 
-RUN mkdir -p /var/run/mysqld
-RUN chown -R mysql:mysql /var/run/mysqld 
-RUN chmod 777 /var/run/mysqld
+RUN mkdir -p /run/mysqld
+RUN chown -R mysql:mysql /run/mysqld 
+RUN chmod 777 /run/mysqld
 
 
 COPY ./tools/mariadb.sh /usr/local/bin/mariadb.sh
